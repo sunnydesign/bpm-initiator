@@ -1,0 +1,10 @@
+version: '3'
+services:
+  bpm-initiator:
+    build: .
+    image: docker.quancy.com.sg/bpm-initiator:${VERSION-latest}
+    container_name: bpm-initiator
+    network_mode: bridge
+    restart: on-failure
+    env_file:
+      - .env
