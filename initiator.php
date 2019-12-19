@@ -27,28 +27,6 @@ if (is_file($config)) {
 }
 
 /**
- * Validate message
- */
-function validate_message($message) {
-    // Headers
-    if(!isset($message['headers'])) {
-        $message = '`headers` not is set in incoming message';
-        Logger::log($message, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
-        exit(1);
-    }
-
-    // Unsafe parameters in headers
-    $unsafeHeadersParams = ['camundaProcessKey'];
-
-    foreach ($unsafeHeadersParams as $paramName) {
-        if(!isset($message['headers'][$paramName])) {
-            $message = '`' . $paramName . '` param not is set in incoming message';
-            Logger::log($message, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
-            exit(1);
-        }
-    }
-}
-/**
  * Close connection
  *
  * @param $connection
@@ -75,6 +53,28 @@ function shutdown($connection)
     $connection->close();
 }
 
+/**
+ * Validate message
+ */
+function validate_message($message) {
+    // Headers
+    if(!isset($message['headers'])) {
+        $message = '`headers` not is set in incoming message';
+        Logger::log($message, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
+        exit(1);
+    }
+
+    // Unsafe parameters in headers
+    $unsafeHeadersParams = ['camundaProcessKey'];
+
+    foreach ($unsafeHeadersParams as $paramName) {
+        if(!isset($message['headers'][$paramName])) {
+            $message = '`' . $paramName . '` param not is set in incoming message';
+            Logger::log($message, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
+            exit(1);
+        }
+    }
+}
 
 /**
  * Callback
@@ -99,11 +99,10 @@ $callback = function($msg) {
     // Validate message
     validate_message($message);
 
-    $updateVariables = [
-        'message' => [
-            'value' => json_encode(json_encode($message)),
-            'type' => 'String'
-        ]
+    // Update variables
+    $updateVariables['message'] = [
+        'value' => json_encode($message),
+        'type' => 'json'
     ];
 
     // REQUEST to API

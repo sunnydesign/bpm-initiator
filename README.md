@@ -27,8 +27,8 @@ BPM Initiator on PHP. Using to start business process in Camunda BPM.
 - RMQ_VHOST=quancy.com.sg
 - RMQ_USER=`<secret>`
 - RMQ_PASS=`<secret>`
-- RMQ_QUEUE_IN=bpm_in
-- RMQ_QUEUE_OUT=bpm_out
+- RMQ_QUEUE_IN=bpm_init
+- CAMUNDA_INITIATOR_PREFIX_KEY=key/
 
 ## Message format
 
