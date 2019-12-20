@@ -1,4 +1,5 @@
 #!/usr/bin/php
+
 <?php
 /**
  * Camunda Process Initiator
@@ -14,8 +15,6 @@ use Camunda\Service\ProcessDefinitionService;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Quancy\Logger\Logger;
-
-const WAIT_BEFORE_RECONNECT_US = 1000;
 
 // Config
 $config = __DIR__ . '/config.php';
@@ -59,8 +58,8 @@ function shutdown($connection)
 function validate_message($message) {
     // Headers
     if(!isset($message['headers'])) {
-        $message = '`headers` not is set in incoming message';
-        Logger::log($message, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
+        $logMessage = '`headers` is not set in incoming message';
+        Logger::log($logMessage, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
         exit(1);
     }
 
@@ -69,8 +68,8 @@ function validate_message($message) {
 
     foreach ($unsafeHeadersParams as $paramName) {
         if(!isset($message['headers'][$paramName])) {
-            $message = '`' . $paramName . '` param not is set in incoming message';
-            Logger::log($message, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
+            $logMessage = '`' . $paramName . '` param is not set in incoming message';
+            Logger::log($logMessage, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1);
             exit(1);
         }
     }
@@ -93,7 +92,6 @@ $callback = function($msg) {
     }
 
     // Update variables
-    // @todo: обработка входящих прееменных и их конвертация
     $message = json_decode($msg->body, true);
 
     // Validate message
@@ -102,7 +100,7 @@ $callback = function($msg) {
     // Update variables
     $updateVariables['message'] = [
         'value' => json_encode($message),
-        'type' => 'json'
+        'type' => 'Json'
     ];
 
     // REQUEST to API
@@ -118,11 +116,19 @@ $callback = function($msg) {
 
     // success
     if($processDefinitionService->getResponseCode() == 200) {
-        Logger::log(sprintf("Process instance <%s> is launched", $processDefinitionService->getResponseContents()->id), 'input', RMQ_QUEUE_IN,'bpm-initiator', 0 );
+        $logMessage = sprintf(
+            "Process instance <%s> from process <%s> is launched",
+            $processDefinitionService->getResponseContents()->id,
+            $message['headers']['camundaProcessKey']
+        );
+        Logger::log($logMessage, 'input', RMQ_QUEUE_IN,'bpm-initiator', 0 );
     } else {
-        // @todo: обработка прочих ошибок / не 404
-        $message = $processDefinitionService->getResponseContents()->message ?? 'Request error';
-        Logger::log($message, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1 );
+        $logMessage = sprintf(
+            "Process instance from process <%s> is not launched, because `%s`",
+            $message['headers']['camundaProcessKey'],
+            $processDefinitionService->getResponseContents()->message ?? 'Request error'
+        );
+        Logger::log($logMessage, 'input', RMQ_QUEUE_IN,'bpm-initiator', 1 );
     }
 };
 
@@ -135,7 +141,7 @@ while(true) {
         $connection = new AMQPStreamConnection(RMQ_HOST, RMQ_PORT, RMQ_USER, RMQ_PASS, RMQ_VHOST, false, 'AMQPLAIN', null, 'en_US', 3.0, 3.0, null, true, 60);
         register_shutdown_function('shutdown', $connection);
 
-        echo ' [*] Waiting for messages. To exit press CTRL+C', "\n";
+        Logger::log('Waiting for messages. To exit press CTRL+C', '-', '-','bpm-connector-in', 0);
 
         // Your application code goes here.
         $channel = $connection->channel();
@@ -145,20 +151,20 @@ while(true) {
 
         while ($channel->is_consuming()) {
             $channel->wait(null, true, 0);
-            sleep(1);
+            usleep(RMQ_TICK_TIMEOUT);
         }
 
     } catch(AMQPRuntimeException $e) {
         echo $e->getMessage() . PHP_EOL;
         cleanup_connection($connection);
-        usleep(WAIT_BEFORE_RECONNECT_US);
+        usleep(RMQ_RECONNECT_TIMEOUT);
     } catch(\RuntimeException $e) {
         echo "Runtime exception " . PHP_EOL;
         cleanup_connection($connection);
-        usleep(WAIT_BEFORE_RECONNECT_US);
+        usleep(RMQ_RECONNECT_TIMEOUT);
     } catch(\ErrorException $e) {
         echo "Error exception " . PHP_EOL;
         cleanup_connection($connection);
-        usleep(WAIT_BEFORE_RECONNECT_US);
+        usleep(RMQ_RECONNECT_TIMEOUT);
     }
 }
