@@ -1,43 +1,28 @@
-FROM ubuntu
-LABEL MAINTAINER am@kubia.com
+FROM php:7.2-cli
+LABEL MAINTAINER="am@kubia.com"
 
-ENV TZ=Asia/Singapore
+RUN apt-get update && apt-get -yqq install git zlib1g-dev libsodium-dev libmcrypt-dev libgmp-dev \
+    && pecl install mcrypt-1.0.2 \
+    && docker-php-ext-install -j$(nproc) bcmath \
+    && docker-php-ext-install -j$(nproc) gmp \
+    && docker-php-ext-install -j$(nproc) sockets \
+    && docker-php-ext-install -j$(nproc) zip \
+    && docker-php-ext-install -j$(nproc) pcntl
 
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    &&  apt-get -yqq update && apt-get -yqq upgrade && apt-get -yqq install \
-        apt-utils \
-        php7.2-cli \
-        php7.2-bcmath \
-        php-mbstring \
-        php-amqp \
-        htop \
-        mc \
-        composer
 
 COPY ./ /opt/ms
 
-#################################
-# Supervisor & log
-#################################
+RUN useradd composer -b /home/composer && mkdir /home/composer && chown composer:composer /home/composer
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN curl -sS https://getcomposer.org/installer | php -- \
+        --filename=composer \
+        --install-dir=/usr/local/bin && \
+        echo "alias composer='composer'" >> /home/composer/.bashrc
 
-RUN mkdir -p /var/log/supervisor \
-    && apt-get install -y supervisor
-
-#################################
-# Composer
-#################################
-
-RUN useradd composer -b /home/composer \
-    && mkdir /home/composer \
-    && chown composer:composer /home/composer \
-    && echo "alias composer='composer'" >> /home/composer/.bashrc \
-    && cd /opt/ms \
+RUN cd /opt/ms \
     && chown -R composer:composer /opt/ms \
     && su composer -c 'composer install' \
     && chown -R www-data:www-data /opt/ms
 
 WORKDIR /opt/ms
-
-ENTRYPOINT /usr/bin/supervisord
+CMD [ "php", "./initiator.php" ]
