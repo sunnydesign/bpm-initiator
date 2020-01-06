@@ -25,4 +25,4 @@ RUN cd /opt/ms \
     && chown -R www-data:www-data /opt/ms
 
 WORKDIR /opt/ms
-CMD [ "php", "./initiator.php" ]
+CMD [ "php", "./start.php" ]

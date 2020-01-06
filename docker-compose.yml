@@ -5,6 +5,6 @@ services:
     image: docker.quancy.com.sg/bpm-initiator:${VERSION-latest}
     container_name: bpm-initiator
     network_mode: bridge
-    restart: on-failure
+    restart: always
     env_file:
       - .env
