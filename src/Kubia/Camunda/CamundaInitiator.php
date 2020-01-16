@@ -2,6 +2,8 @@
 
 namespace Kubia\Camunda;
 
+use Camunda\Entity\Request\ProcessDefinitionRequest;
+use Camunda\Service\ProcessDefinitionService;
 use PhpAmqpLib\Message\AMQPMessage;
 use Quancy\Logger\Logger;
 
