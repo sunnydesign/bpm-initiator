@@ -57,7 +57,12 @@ for($i=0; $i<5; $i++) {
         exit(1);
     }
 
-    $dataInJson = file_get_contents(__DIR__ . '/messageAsync.json');
+    if(array_key_exists('async', $options))
+        $filename  ='messageAsync.json';
+    else
+        $filename  ='messageSync.json';
+
+    $dataInJson = file_get_contents(__DIR__ . '/' . $filename);
     $data = json_decode($dataInJson, true);
     $dataInJson = json_encode($data);
 
