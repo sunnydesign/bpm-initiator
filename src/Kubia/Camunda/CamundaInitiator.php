@@ -20,6 +20,9 @@ class CamundaInitiator extends CamundaBaseConnector
     /** @var bool */
     public $startAllowed = true;
 
+    /** @var bool */
+    public $processStarted = false;
+
     /**
      * Check running process instances with current business key
      */
@@ -40,10 +43,6 @@ class CamundaInitiator extends CamundaBaseConnector
         ) {
             // disallow start
             $this->startAllowed = false;
-
-            if($this->msg->has('correlation_id') && $this->msg->has('reply_to')) {
-                $this->sendSynchronousResponse($this->msg);
-            }
         }
     }
 
@@ -69,6 +68,7 @@ class CamundaInitiator extends CamundaBaseConnector
 
         // success
         if($processDefinitionService->getResponseCode() == 200) {
+            $this->processStarted = true;
             $logMessage = sprintf(
                 "Process instance <%s> from process <%s> is launched",
                 $processDefinitionService->getResponseContents()->id,
@@ -108,8 +108,11 @@ class CamundaInitiator extends CamundaBaseConnector
         // Check running process instances with current business key
         $this->isProcessInstanceAlreadyStarted();
 
-        if($this->startAllowed) {
+        if($this->startAllowed)
             $this->startProcessInstance();
-        }
+
+        // response if is synchronous mode
+        if($this->msg->has('correlation_id') && $this->msg->has('reply_to'))
+            $this->sendSynchronousResponse($this->msg, $this->processStarted);
     }
 }
