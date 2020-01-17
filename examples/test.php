@@ -77,6 +77,7 @@ for($i=0; $i<5; $i++) {
 
     if($async) {
         $message = new AMQPMessage(json_encode($data));
+        $channel->basic_publish($message, '', RMQ_QUEUE_IN);
     } else {
         $response = $AMQPResponse->send($data);
         print " [x] Response '$response'" . PHP_EOL;
