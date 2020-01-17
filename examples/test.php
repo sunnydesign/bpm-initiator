@@ -22,6 +22,7 @@ class AMQPResponse {
         $delivery_data = ['correlation_id' => $this->corr_id, 'reply_to' => $this->callback_queue];
         $data = array_merge($data, $delivery_data);
         $message = new AMQPMessage(json_encode($data), $delivery_data);
+
         $this->channel->basic_publish($message, '', RMQ_QUEUE_IN);
 
         while(!$this->response) {
@@ -57,10 +58,13 @@ for($i=0; $i<5; $i++) {
         exit(1);
     }
 
-    if(array_key_exists('async', $options))
-        $filename  ='messageAsync.json';
-    else
+    if(array_key_exists('async', $options)) {
+        $filename = 'messageAsync.json';
+        $async = true;
+    } else {
         $filename  ='messageSync.json';
+        $async = false;
+    }
 
     $dataInJson = file_get_contents(__DIR__ . '/' . $filename);
     $data = json_decode($dataInJson, true);
@@ -71,10 +75,12 @@ for($i=0; $i<5; $i++) {
 
     print " [x] Sent '" . $dataInJson . PHP_EOL;
 
-    $response = $AMQPResponse->send($data);
-
-    print " [x] Response '$response'" . PHP_EOL;
-
+    if($async) {
+        $message = new AMQPMessage(json_encode($data));
+    } else {
+        $response = $AMQPResponse->send($data);
+        print " [x] Response '$response'" . PHP_EOL;
+    }
     $channel->close();
     $connection->close();
 }
