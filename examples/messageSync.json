@@ -1,0 +1,49 @@
+{
+  "data": {
+    "parameters": {
+      "type": "sms",
+      "key": "79990001122",
+      "object": "79990001122"
+    },
+    "user": {
+      "id": 339,
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@kubia.com",
+      "email_validated": true,
+      "phone": "9990001122",
+      "code": "7",
+      "address": "Address",
+      "status": "ACTIVE",
+      "active": true,
+      "doc_types": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "doc_required": true,
+      "reg_state": 5,
+      "send_to_crm": "Y",
+      "avatar": {
+        "32": "https://sandbox-storage.quancy.com.sg/avatars/23d/32-264ae03c05d1934bd3bbbc79480f1.jpg",
+        "64": "https://sandbox-storage.quancy.com.sg/avatars/23d/64-264ae03c05d1934bd3bbbc79480f1.jpg",
+        "128": "https://sandbox-storage.quancy.com.sg/avatars/23d/128-264ae03c05d1934bd3bbbc79480f1.jpg"
+      },
+      "qr": "...",
+      "type": "Corporate",
+      "phone_formatted": "+7 999 000-11-22",
+      "demo": 1,
+      "required_documents": null,
+      "balance": {
+        "amount": "365",
+        "currency": "USD"
+      }
+    }
+  },
+  "headers": {
+    "camundaProcessKey": "connector-ms-otp",
+    "camundaBusinessKey": "user-corp-38249",
+    "camundaProcessUnique": true
+  }
+}

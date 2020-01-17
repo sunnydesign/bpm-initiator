@@ -45,13 +45,13 @@ $connection = new AMQPStreamConnection(
 $camundaConfig = [
     'apiUrl'   => CAMUNDA_API_URL,
     'apiLogin' => CAMUNDA_API_LOGIN,
-    'apiPass'  => CAMUNDA_API_PASS
+    'apiPass'  => CAMUNDA_API_PASS,
+    'prefix'   => CAMUNDA_INITIATOR_PREFIX_KEY
 ];
 $rmqConfig = [
     'queue'            => RMQ_QUEUE_IN,
     'tickTimeout'      => RMQ_TICK_TIMEOUT,
-    'reconnectTimeout' => RMQ_RECONNECT_TIMEOUT,
-    'prefix'           => CAMUNDA_INITIATOR_PREFIX_KEY
+    'reconnectTimeout' => RMQ_RECONNECT_TIMEOUT
 ];
 
 // Run worker
