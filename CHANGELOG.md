@@ -28,5 +28,5 @@ BPM Initiator on PHP. Using to start business process in Camunda BPM.
 - Format transit messages from Rabbit MQ changed from `String` to `Json`
 
 [unreleased]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.2
-[unreleased]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.1
+[0.2]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.2
 [0.1]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.1
