@@ -40,7 +40,7 @@ class AMQPResponse {
 }
 
 // for test; remove it
-for($i=0; $i<5; $i++) {
+for($i=0; $i<1; $i++) {
     $connection = new AMQPStreamConnection(RMQ_HOST, RMQ_PORT, RMQ_USER, RMQ_PASS, RMQ_VHOST, false, 'AMQPLAIN', null, 'en_US', 3.0, 3.0, null, true, 60);
     $channel = $connection->channel();
     $channel->confirm_select(); // change channel mode to confirm mode

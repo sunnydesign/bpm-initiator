@@ -17,18 +17,13 @@ class CamundaInitiator extends CamundaBaseConnector
     /** @var string */
     public $logOwner = 'bpm-initiator';
 
-    /** @var bool */
-    public $startAllowed = true;
-
-    /** @var bool */
-    public $processStarted = false;
-
     /**
      * Check running process instances with current business key
+     * @return bool
      */
-    public function isProcessInstanceAlreadyStarted(): void
+    public function isProcessInstanceAlreadyStarted(): bool
     {
-        $this->startAllowed = true;
+        $isAlreadyStarted = false;
 
         if(
             isset($this->headers['camundaProcessUnique']) &&
@@ -44,15 +39,22 @@ class CamundaInitiator extends CamundaBaseConnector
             // if process already exist
             if((int)$processInstanceService->count > 0) {
                 // disallow start
-                $this->startAllowed = false;
+                $this->requestErrorMessage = 'Process already exists';
+                $isAlreadyStarted = true;
             }
         }
+
+        return $isAlreadyStarted;
     }
 
     /**
      * Start process instance
+     * @return bool
      */
-    public function startProcessInstance(): void {
+    public function startProcessInstance(): bool
+    {
+        $this->requestErrorMessage = 'Request error';
+
         // Update variables
         $this->updatedVariables['message'] = [
             'value' => json_encode($this->message),
@@ -71,13 +73,14 @@ class CamundaInitiator extends CamundaBaseConnector
 
         // success
         if($processDefinitionService->getResponseCode() == 200) {
-            $this->processStarted = true;
             $logMessage = sprintf(
                 "Process instance <%s> from process <%s> is launched",
                 $processDefinitionService->getResponseContents()->id,
                 $this->headers['camundaProcessKey']
             );
             Logger::log($logMessage, 'input', $this->rmqConfig['queue'], $this->logOwner, 0 );
+
+            return true;
         } else {
             $logMessage = sprintf(
                 "Process instance from process <%s> is not launched, because `%s`",
@@ -85,6 +88,8 @@ class CamundaInitiator extends CamundaBaseConnector
                 $processDefinitionService->getResponseContents()->message ?? $this->requestErrorMessage
             );
             Logger::log($logMessage, 'input', $this->rmqConfig['queue'], $this->logOwner, 1 );
+
+            return false;
         }
     }
 
@@ -109,13 +114,12 @@ class CamundaInitiator extends CamundaBaseConnector
         $this->validateMessage();
 
         // Check running process instances with current business key
-        $this->isProcessInstanceAlreadyStarted();
+        $isAlreadyStarted = $this->isProcessInstanceAlreadyStarted();
 
-        if($this->startAllowed)
-            $this->startProcessInstance();
+        $processStarted = !$isAlreadyStarted ? $this->startProcessInstance() : false;
 
         // response if is synchronous mode
         if($this->msg->has('correlation_id') && $this->msg->has('reply_to'))
-            $this->sendSynchronousResponse($this->msg, $this->processStarted);
+            $this->sendSynchronousResponse($this->msg, $processStarted);
     }
 }
