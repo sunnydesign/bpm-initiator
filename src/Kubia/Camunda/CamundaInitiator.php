@@ -28,21 +28,24 @@ class CamundaInitiator extends CamundaBaseConnector
      */
     public function isProcessInstanceAlreadyStarted(): void
     {
-        // count running process instances
-        $processInstanceRequest = (new ProcessInstanceRequest())
-            ->set('businessKey', $this->headers['camundaBusinessKey']);
+        $this->startAllowed = true;
 
-        $processInstanceService = (new ProcessInstanceService($this->camundaUrl))
-            ->getListCount($processInstanceRequest);
-
-        // if process already exist
         if(
-            (int)$processInstanceService->count > 0 &&
             isset($this->headers['camundaProcessUnique']) &&
             filter_var($this->headers['camundaProcessUnique'], FILTER_VALIDATE_BOOLEAN)
         ) {
-            // disallow start
-            $this->startAllowed = false;
+            // count running process instances
+            $processInstanceRequest = (new ProcessInstanceRequest())
+                ->set('businessKey', $this->headers['camundaBusinessKey']);
+
+            $processInstanceService = (new ProcessInstanceService($this->camundaUrl))
+                ->getListCount($processInstanceRequest);
+
+            // if process already exist
+            if((int)$processInstanceService->count > 0) {
+                // disallow start
+                $this->startAllowed = false;
+            }
         }
     }
 
