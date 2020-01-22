@@ -116,12 +116,15 @@ class CamundaInitiator extends CamundaBaseConnector
         // Check running process instances with current business key
         $isAlreadyStarted = $this->isProcessInstanceAlreadyStarted();
 
+        // add correlation_id and reply_to to process variables if is synchronous request
+        $this->mixRabbitCorrelationInfo();
+
         $processInstanceId = !$isAlreadyStarted ? $this->startProcessInstance() : null;
 
         $processStarted = (bool)$processInstanceId;
 
         // response if is synchronous mode
-        if($this->msg->has('correlation_id') && $this->msg->has('reply_to'))
-            $this->sendSynchronousResponse($this->msg, $processStarted, $processInstanceId);
+        if (!$processStarted && $this->msg->has('correlation_id') && $this->msg->has('reply_to'))
+            $this->sendSynchronousResponse($this->msg, false);
     }
 }
