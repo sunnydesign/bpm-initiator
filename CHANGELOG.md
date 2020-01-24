@@ -8,6 +8,16 @@ BPM Initiator on PHP. Using to start business process in Camunda BPM.
 
 - Nothing
 
+## [0.3] - 2020-01-24
+
+### Changed 
+
+- Version kubia/camunda from 0.2 to 0.3
+
+### Added
+
+- Logging to elasticsearch
+
 ## [0.2] - 2020-01-17
 
 ### Added
@@ -27,6 +37,7 @@ BPM Initiator on PHP. Using to start business process in Camunda BPM.
 - All ticks timeout moved to config
 - Format transit messages from Rabbit MQ changed from `String` to `Json`
 
-[unreleased]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.2
+[unreleased]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.3
+[0.3]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.3
 [0.2]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.2
 [0.1]: https://gitlab.com/quancy-core/bpm-initiator/-/tags/0.1

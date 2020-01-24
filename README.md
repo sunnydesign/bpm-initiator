@@ -4,7 +4,8 @@ BPM Initiator on PHP. Using to start business process in Camunda BPM.
 ## Docker images
 | Docker image | Version tag | Date of build |
 | --- | --- | --- |
-| docker.quancy.com.sg/bpm-initiator | latest | 2020-01-17 |
+| docker.quancy.com.sg/bpm-initiator | latest | 2020-01-24 |
+| docker.quancy.com.sg/bpm-initiator | 0.3 | 2020-01-24 |
 | docker.quancy.com.sg/bpm-initiator | 0.2 | 2020-01-17 |
 | docker.quancy.com.sg/bpm-initiator | 0.1 | 2019-12-20 |
 

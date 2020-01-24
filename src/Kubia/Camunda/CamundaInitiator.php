@@ -33,6 +33,7 @@ class CamundaInitiator extends CamundaBaseConnector
             $processInstanceRequest = (new ProcessInstanceRequest())
                 ->set('businessKey', $this->headers['camundaBusinessKey']);
 
+            // request
             $processInstanceService = (new ProcessInstanceService($this->camundaUrl))
                 ->getListCount($processInstanceRequest);
 
@@ -59,6 +60,7 @@ class CamundaInitiator extends CamundaBaseConnector
             'type' => 'Json'
         ];
 
+        // preparing
         $processDefinitionRequest = (new ProcessDefinitionRequest())
             ->set('variables', $this->updatedVariables)
             ->set('businessKey', $this->headers['camundaBusinessKey']);
@@ -76,7 +78,18 @@ class CamundaInitiator extends CamundaBaseConnector
                 $processDefinitionService->getResponseContents()->id,
                 $this->headers['camundaProcessKey']
             );
-            Logger::log($logMessage, 'input', $this->rmqConfig['queue'], $this->logOwner, 0 );
+            Logger::stdout($logMessage, 'input', $this->rmqConfig['queue'], $this->logOwner, 0 );
+            if(isset($this->rmqConfig['queueLog'])) {
+                Logger::elastic('bpm',
+                    'started',
+                    '',
+                    $this->data,
+                    $this->headers,
+                    [],
+                    $this->channel,
+                    $this->rmqConfig['queueLog']
+                );
+            }
 
             return $processDefinitionService->getResponseContents()->id;
         } else {
@@ -85,9 +98,30 @@ class CamundaInitiator extends CamundaBaseConnector
                 $this->headers['camundaProcessKey'],
                 $processDefinitionService->getResponseContents()->message ?? $this->requestErrorMessage
             );
-            Logger::log($logMessage, 'input', $this->rmqConfig['queue'], $this->logOwner, 1 );
+            $this->logError($logMessage);
 
             return null;
+        }
+    }
+
+    /**
+     * Logging if system error
+     * @param string $message
+     */
+    public function logError(string $message): void
+    {
+        Logger::stdout($message, 'input', $this->rmqConfig['queue'], $this->logOwner, 1 );
+
+        if(isset($this->rmqConfig['queueLog'])) {
+            Logger::elastic('bpm',
+                'error',
+                '',
+                $this->data,
+                $this->headers,
+                ['type' => 'system', 'message' => $message],
+                $this->channel,
+                $this->rmqConfig['queueLog']
+            );
         }
     }
 
@@ -97,7 +131,7 @@ class CamundaInitiator extends CamundaBaseConnector
      */
     public function callback(AMQPMessage $msg): void
     {
-        Logger::log(sprintf("Received %s", $msg->body), 'input', $this->rmqConfig['queue'], $this->logOwner, 0);
+        Logger::stdout(sprintf("Received %s", $msg->body), 'input', $this->rmqConfig['queue'], $this->logOwner, 0);
 
         $this->requestErrorMessage = 'Request error';
 
