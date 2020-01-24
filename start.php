@@ -23,44 +23,6 @@ if (is_file($config)) {
     require_once $config_env;
 }
 
-// Create connection
-$connection = new AMQPStreamConnection(
-    RMQ_HOST,
-    RMQ_PORT,
-    RMQ_USER,
-    RMQ_PASS,
-    RMQ_VHOST,
-    false,
-    'AMQPLAIN',
-    null,
-    'en_US',
-    3.0,
-    3.0,
-    null,
-    true,
-    60
-);
-if(LOGGING) {
-    // Create connection for logging
-    $connectionLog = new AMQPStreamConnection(
-        RMQ_HOST,
-        RMQ_PORT,
-        RMQ_USER_LOG,
-        RMQ_PASS_LOG,
-        RMQ_VHOST_LOG,
-        false,
-        'AMQPLAIN',
-        null,
-        'en_US',
-        3.0,
-        3.0,
-        null,
-        true,
-        60
-    );
-} else {
-    $connectionLog = null;
-}
 // Config
 $camundaConfig = [
     'apiUrl'   => CAMUNDA_API_URL,
@@ -69,6 +31,11 @@ $camundaConfig = [
     'prefix'   => CAMUNDA_INITIATOR_PREFIX_KEY
 ];
 $rmqConfig = [
+    'host'             => RMQ_HOST,
+    'port'             => RMQ_PORT,
+    'user'             => RMQ_USER,
+    'pass'             => RMQ_PASS,
+    'vhost'            => RMQ_VHOST,
     'queue'            => RMQ_QUEUE_IN,
     'tickTimeout'      => RMQ_TICK_TIMEOUT,
     'reconnectTimeout' => RMQ_RECONNECT_TIMEOUT,
@@ -80,5 +47,5 @@ $rmqConfig = [
 ];
 
 // Run worker
-$worker = new CamundaInitiator($connection, $connectionLog, $camundaConfig, $rmqConfig);
+$worker = new CamundaInitiator($camundaConfig, $rmqConfig);
 $worker->run();
