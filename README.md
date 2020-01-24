@@ -11,6 +11,7 @@ BPM Initiator on PHP. Using to start business process in Camunda BPM.
 
 ## Queues
 - Incoming queue: `bpm_init`
+- Log queue: `bpm_events`
 
 ## Requirements
 - php7.2-cli
