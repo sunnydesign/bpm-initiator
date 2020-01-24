@@ -83,8 +83,8 @@ class CamundaInitiator extends CamundaBaseConnector
                 Logger::elastic('bpm',
                     'started',
                     '',
-                    (object)$this->message['data'] ?? (object)[],
-                    (object)$this->headers ?? (object)[],
+                    (object)($this->message['data'] ?? []),
+                    (object)($this->headers ?? []),
                     [],
                     $this->channel,
                     $this->rmqConfig['queueLog']
@@ -116,8 +116,8 @@ class CamundaInitiator extends CamundaBaseConnector
             Logger::elastic('bpm',
                 'error',
                 '',
-                (object)$this->message['data'] ?? (object)[],
-                (object)$this->headers ?? (object)[],
+                (object)($this->message['data'] ?? []),
+                (object)($this->headers ?? []),
                 ['type' => 'system', 'message' => $message],
                 $this->channel,
                 $this->rmqConfig['queueLog']
