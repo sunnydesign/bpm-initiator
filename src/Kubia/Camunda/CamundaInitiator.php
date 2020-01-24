@@ -79,7 +79,7 @@ class CamundaInitiator extends CamundaBaseConnector
                 $this->headers['camundaProcessKey']
             );
             Logger::stdout($logMessage, 'input', $this->rmqConfig['queue'], $this->logOwner, 0 );
-            if(isset($this->rmqConfig['queueLog'])) {
+            if($this->rmqConfig['logging']) {
                 Logger::elastic('bpm',
                     'started',
                     '',
@@ -112,7 +112,7 @@ class CamundaInitiator extends CamundaBaseConnector
     {
         Logger::stdout($message, 'input', $this->rmqConfig['queue'], $this->logOwner, 1 );
 
-        if(isset($this->rmqConfig['queueLog'])) {
+        if($this->rmqConfig['logging']) {
             Logger::elastic('bpm',
                 'error',
                 '',
