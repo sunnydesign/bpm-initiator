@@ -69,16 +69,20 @@ class CamundaInitiator extends CamundaBaseConnector
         $key = $this->camundaConfig['prefix'] . $this->headers['camundaProcessKey'];
 
         // request
-        $processDefinitionService->startInstanceByKey($key, '', $processDefinitionRequest);
+        $response = $processDefinitionService->startInstanceByKey($key, '', $processDefinitionRequest);
 
         // success
         if($processDefinitionService->getResponseCode() == 200) {
+            if(property_exists($response, 'id'))
+                $this->headers['camundaProcessInstanceId'] = $response->id;
+
             $logMessage = sprintf(
                 "Process instance <%s> from process <%s> is launched",
                 $processDefinitionService->getResponseContents()->id,
                 $this->headers['camundaProcessKey']
             );
             Logger::stdout($logMessage, 'input', $this->rmqConfig['queue'], $this->logOwner, 0 );
+
             if($this->rmqConfig['logging']) {
                 Logger::elastic('bpm',
                     'started',
