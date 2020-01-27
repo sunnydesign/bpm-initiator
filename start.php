@@ -11,7 +11,6 @@ sleep(1); // timeout for start through supervisor
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Libs
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Kubia\Camunda\CamundaInitiator;
 
 // Config
