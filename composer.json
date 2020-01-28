@@ -1,5 +1,5 @@
 {
-    "name": "kubia/bpm-connector",
+    "name": "kubia/bpm-initiator",
     "description": "Camunda Process Initiator",
     "keywords": ["initiator", "bpm", "Camunda", "Rabbit MQ", "process init"],
     "license": "proprietary",

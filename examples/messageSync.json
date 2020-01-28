@@ -42,7 +42,7 @@
     }
   },
   "headers": {
-    "camundaProcessKey": "connector-ms-otp",
+    "camundaProcessKey": "connector-ms-otp-parent",
     "camundaBusinessKey": "user-corp-38249q",
     "camundaProcessUnique": true
   }
